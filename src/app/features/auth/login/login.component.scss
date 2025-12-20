@@ -1,83 +1,339 @@
-.auth-container {
+// ===== MODERN LOGIN STYLES =====
+
+// Variables
+$primary-color: #6366f1;
+$primary-dark: #4f46e5;
+$primary-light: #818cf8;
+$secondary-color: #ec4899;
+$text-primary: #1e293b;
+$text-secondary: #64748b;
+$background: #f8fafc;
+$card-background: #ffffff;
+$border-color: #e2e8f0;
+$success-color: #10b981;
+$error-color: #ef4444;
+
+// Animation
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+// Main Wrapper
+.auth-wrapper {
+  position: relative;
+  min-height: 100vh;
   display: flex;
-  justify-content: center;
   align-items: center;
-  min-height: calc(100vh - 128px);
-  padding: 20px;
+  justify-content: center;
+  overflow: hidden;
 }
 
-.auth-card {
+// Background
+.auth-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  z-index: 0;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: float 20s ease-in-out infinite;
+  }
+
+  .gradient-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, 
+      rgba(99, 102, 241, 0.9) 0%, 
+      rgba(236, 72, 153, 0.8) 100%
+    );
+  }
+}
+
+// Container
+.auth-container {
+  position: relative;
+  z-index: 1;
   width: 100%;
-  max-width: 450px;
-  padding: 32px;
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  max-width: 480px;
+  padding: 20px;
+  animation: fadeInUp 0.6s ease-out;
 }
 
-.auth-header {
+// Card
+.auth-card {
+  background: $card-background;
+  border-radius: 24px;
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+  padding: 48px 40px;
+  backdrop-filter: blur(10px);
+  border: none;
+
+  mat-card-content {
+    padding: 0 !important;
+  }
+}
+
+// Brand Section
+.brand-section {
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 40px;
 
-  .auth-icon {
-    display: flex;
+  .brand-icon {
+    display: inline-flex;
+    align-items: center;
     justify-content: center;
-    margin-bottom: 16px;
-
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, $primary-color 0%, $secondary-color 100%);
+    border-radius: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+    
     mat-icon {
-      font-size: 64px;
-      width: 64px;
-      height: 64px;
-      color: #3f51b5;
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      color: white;
     }
   }
 
-  mat-card-title {
+  .brand-title {
     font-size: 28px;
-    font-weight: 600;
-    margin-bottom: 8px;
+    font-weight: 700;
+    color: $text-primary;
+    margin: 0 0 8px 0;
+    letter-spacing: -0.5px;
   }
 
-  mat-card-subtitle {
-    font-size: 16px;
-    color: #666;
+  .brand-subtitle {
+    font-size: 15px;
+    color: $text-secondary;
+    margin: 0;
+    font-weight: 400;
   }
 }
 
+// Form Header
+.form-header {
+  margin-bottom: 32px;
+
+  h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: $text-primary;
+    margin: 0 0 8px 0;
+  }
+
+  p {
+    font-size: 14px;
+    color: $text-secondary;
+    margin: 0;
+  }
+}
+
+// Form Fields
 .full-width {
   width: 100%;
 }
 
-mat-form-field {
-  margin-bottom: 16px;
-}
+.modern-field {
+  margin-bottom: 20px;
 
-.submit-button {
-  height: 48px;
-  font-size: 16px;
-  font-weight: 600;
-  margin-top: 16px;
-  position: relative;
+  ::ng-deep {
+    .mat-mdc-text-field-wrapper {
+      background: $background;
+      border-radius: 12px;
+    }
 
-  .button-spinner {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+    .mat-mdc-form-field-focus-overlay {
+      background-color: transparent;
+    }
+
+    .mat-mdc-form-field-subscript-wrapper {
+      margin-top: 8px;
+    }
+
+    .mdc-notched-outline {
+      .mdc-notched-outline__leading,
+      .mdc-notched-outline__notch,
+      .mdc-notched-outline__trailing {
+        border-color: $border-color !important;
+      }
+    }
+
+    &.mat-focused {
+      .mdc-notched-outline {
+        .mdc-notched-outline__leading,
+        .mdc-notched-outline__notch,
+        .mdc-notched-outline__trailing {
+          border-color: $primary-color !important;
+          border-width: 2px !important;
+        }
+      }
+    }
+
+    .mat-mdc-input-element {
+      font-size: 15px;
+      padding: 16px 12px;
+      color: $text-primary;
+
+      &::placeholder {
+        color: $text-secondary;
+        opacity: 0.7;
+      }
+    }
+
+    .mat-mdc-form-field-icon-prefix {
+      padding-right: 12px;
+    }
+  }
+
+  .field-icon {
+    color: $text-secondary;
+    font-size: 20px;
+  }
+
+  .visibility-toggle {
+    color: $text-secondary;
+    
+    &:hover {
+      color: $primary-color;
+    }
   }
 }
 
+// Forgot Password
+.forgot-password {
+  text-align: right;
+  margin: -8px 0 24px 0;
+
+  .link-text {
+    font-size: 14px;
+    color: $primary-color;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+
+    &:hover {
+      color: $primary-dark;
+      text-decoration: underline;
+    }
+  }
+}
+
+// Buttons
+.modern-button {
+  height: 56px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 12px;
+  text-transform: none;
+  letter-spacing: 0.3px;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  background: linear-gradient(135deg, $primary-color 0%, $primary-dark 100%);
+  transition: all 0.3s ease;
+
+  &:hover:not(:disabled) {
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+    transform: translateY(-2px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .button-icon {
+    margin-right: 8px;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  .button-spinner {
+    display: inline-block;
+    margin: 0 auto;
+  }
+}
+
+.modern-button-outline {
+  height: 56px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 12px;
+  text-transform: none;
+  letter-spacing: 0.3px;
+  border: 2px solid $border-color;
+  color: $text-primary;
+  background: transparent;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: $primary-color;
+    color: $primary-color;
+    background: rgba(99, 102, 241, 0.05);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+  }
+
+  .button-icon {
+    margin-right: 8px;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+// Divider
 .auth-divider {
-  text-align: center;
-  margin: 24px 0;
   position: relative;
+  text-align: center;
+  margin: 32px 0;
 
   &::before,
   &::after {
     content: '';
     position: absolute;
     top: 50%;
-    width: calc(50% - 30px);
+    width: calc(50% - 40px);
     height: 1px;
-    background: #e0e0e0;
+    background: linear-gradient(to right, transparent, $border-color, transparent);
   }
 
   &::before {
@@ -89,22 +345,83 @@ mat-form-field {
   }
 
   span {
-    background: white;
-    padding: 0 16px;
-    color: #999;
-    font-size: 14px;
+    background: $card-background;
+    padding: 0 20px;
+    color: $text-secondary;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1px;
   }
 }
 
-.signup-button {
-  height: 48px;
-  font-size: 16px;
-  color: #3f51b5;
-  border-color: #3f51b5;
+// Footer Links
+.footer-links {
+  margin-top: 32px;
+  text-align: center;
+
+  .footer-text {
+    font-size: 13px;
+    color: $text-secondary;
+    line-height: 1.6;
+    margin: 0;
+
+    .link-text {
+      color: $primary-color;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+
+      &:hover {
+        color: $primary-dark;
+        text-decoration: underline;
+      }
+    }
+  }
 }
 
+// Responsive
 @media (max-width: 768px) {
+  .auth-container {
+    padding: 16px;
+  }
+
   .auth-card {
-    padding: 24px;
+    padding: 32px 24px;
+    border-radius: 20px;
+  }
+
+  .brand-section {
+    margin-bottom: 32px;
+
+    .brand-icon {
+      width: 64px;
+      height: 64px;
+
+      mat-icon {
+        font-size: 36px;
+        width: 36px;
+        height: 36px;
+      }
+    }
+
+    .brand-title {
+      font-size: 24px;
+    }
+  }
+
+  .form-header h2 {
+    font-size: 20px;
+  }
+
+  .modern-button,
+  .modern-button-outline {
+    height: 52px;
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 24px 20px;
   }
 }

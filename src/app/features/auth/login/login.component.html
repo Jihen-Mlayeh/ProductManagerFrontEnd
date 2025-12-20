@@ -1,0 +1,79 @@
+<div class="auth-container">
+  <mat-card class="auth-card">
+    <mat-card-header class="auth-header">
+      <div class="auth-icon">
+        <mat-icon>lock</mat-icon>
+      </div>
+      <mat-card-title>Welcome Back</mat-card-title>
+      <mat-card-subtitle>Sign in to your account</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email</mat-label>
+          <input 
+            matInput 
+            type="email" 
+            formControlName="email"
+            placeholder="Enter your email"
+            autocomplete="email">
+          <mat-icon matPrefix>email</mat-icon>
+          <mat-error *ngIf="f['email'].errors?.['required']">
+            Email is required
+          </mat-error>
+          <mat-error *ngIf="f['email'].errors?.['email']">
+            Please enter a valid email
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Password</mat-label>
+          <input 
+            matInput 
+            [type]="hidePassword ? 'password' : 'text'"
+            formControlName="password"
+            placeholder="Enter your password"
+            autocomplete="current-password">
+          <mat-icon matPrefix>lock</mat-icon>
+          <button 
+            mat-icon-button 
+            matSuffix 
+            type="button"
+            (click)="hidePassword = !hidePassword"
+            [attr.aria-label]="'Hide password'" 
+            [attr.aria-pressed]="hidePassword">
+            <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+          <mat-error *ngIf="f['password'].errors?.['required']">
+            Password is required
+          </mat-error>
+          <mat-error *ngIf="f['password'].errors?.['minlength']">
+            Password must be at least 6 characters
+          </mat-error>
+        </mat-form-field>
+
+        <button 
+          mat-raised-button 
+          color="primary" 
+          type="submit"
+          class="full-width submit-button"
+          [disabled]="loading">
+          <mat-spinner *ngIf="loading" diameter="20" class="button-spinner"></mat-spinner>
+          <span *ngIf="!loading">Sign In</span>
+        </button>
+      </form>
+
+      <div class="auth-divider">
+        <span>OR</span>
+      </div>
+
+      <button 
+        mat-stroked-button 
+        class="full-width signup-button"
+        (click)="goToSignup()">
+        Create New Account
+      </button>
+    </mat-card-content>
+  </mat-card>
+</div>

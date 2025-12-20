@@ -1,0 +1,131 @@
+.product-detail-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.loading-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px;
+  gap: 16px;
+
+  p {
+    font-size: 18px;
+    color: #666;
+  }
+}
+
+.product-detail {
+  .detail-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #333;
+      margin: 0;
+    }
+  }
+
+  .detail-card {
+    mat-card-header {
+      margin-bottom: 24px;
+    }
+
+    .product-name {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 32px;
+      font-weight: 700;
+      color: #3f51b5;
+    }
+
+    mat-card-content {
+      padding: 24px 0;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 24px;
+    }
+
+    .detail-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 16px;
+      background: #f5f5f5;
+      border-radius: 8px;
+
+      mat-icon {
+        color: #3f51b5;
+        font-size: 32px;
+        width: 32px;
+        height: 32px;
+      }
+
+      .detail-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        .label {
+          font-size: 14px;
+          color: #666;
+          font-weight: 500;
+        }
+
+        .value {
+          font-size: 18px;
+          color: #333;
+          font-weight: 600;
+
+          &.price {
+            color: #3f51b5;
+            font-size: 24px;
+          }
+
+          &.expired {
+            color: #f44336;
+          }
+        }
+      }
+    }
+
+    .detail-actions {
+      display: flex;
+      gap: 12px;
+      padding: 24px 16px;
+      border-top: 1px solid #e0e0e0;
+      flex-wrap: wrap;
+
+      button {
+        mat-icon {
+          margin-right: 8px;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-actions {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
+  }
+}

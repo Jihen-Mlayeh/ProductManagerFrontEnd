@@ -1,0 +1,9 @@
+.main-content {
+  min-height: calc(100vh - 128px); // 64px navbar + 64px footer
+  padding: 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  
+  @media (max-width: 768px) {
+    padding: 16px;
+  }
+}

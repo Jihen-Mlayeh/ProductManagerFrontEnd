@@ -3,9 +3,9 @@ import { Component } from '@angular/core';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  standalone: false,
+  standalone:false,
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  title = 'product-management-frontend';
+  title = 'Product Management';
 }

@@ -1,0 +1,86 @@
+<div class="product-detail-container">
+  <div class="loading-section" *ngIf="loading">
+    <mat-spinner></mat-spinner>
+    <p>Loading product...</p>
+  </div>
+
+  <div class="product-detail" *ngIf="!loading && product">
+    <div class="detail-header">
+      <button mat-icon-button (click)="onBack()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <h1>Product Details</h1>
+    </div>
+
+    <mat-card class="detail-card">
+      <mat-card-header>
+        <mat-card-title class="product-name">
+          {{ product.name }}
+          <mat-chip *ngIf="isExpired()" color="warn">Expired</mat-chip>
+          <mat-chip *ngIf="!isExpired() && product.price > 1000" color="accent">Premium</mat-chip>
+        </mat-card-title>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <mat-icon>tag</mat-icon>
+            <div class="detail-info">
+              <span class="label">Product ID</span>
+              <span class="value">{{ product.id }}</span>
+            </div>
+          </div>
+
+          <div class="detail-item">
+            <mat-icon>euro</mat-icon>
+            <div class="detail-info">
+              <span class="label">Price</span>
+              <span class="value price">€{{ product.price | number:'1.2-2' }}</span>
+            </div>
+          </div>
+
+          <div class="detail-item" *ngIf="product.expirationDate">
+            <mat-icon>event</mat-icon>
+            <div class="detail-info">
+              <span class="label">Expiration Date</span>
+              <span class="value" [class.expired]="isExpired()">
+                {{ product.expirationDate | date:'fullDate' }}
+              </span>
+            </div>
+          </div>
+
+          <div class="detail-item" *ngIf="product.createdAt">
+            <mat-icon>schedule</mat-icon>
+            <div class="detail-info">
+              <span class="label">Created At</span>
+              <span class="value">{{ product.createdAt | date:'medium' }}</span>
+            </div>
+          </div>
+
+          <div class="detail-item" *ngIf="product.updatedAt">
+            <mat-icon>update</mat-icon>
+            <div class="detail-info">
+              <span class="label">Last Updated</span>
+              <span class="value">{{ product.updatedAt | date:'medium' }}</span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions class="detail-actions">
+        <button mat-raised-button color="primary" (click)="onEdit()">
+          <mat-icon>edit</mat-icon>
+          Edit Product
+        </button>
+        <button mat-raised-button color="warn" (click)="onDelete()">
+          <mat-icon>delete</mat-icon>
+          Delete Product
+        </button>
+        <button mat-stroked-button (click)="onBack()">
+          <mat-icon>arrow_back</mat-icon>
+          Back to List
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>

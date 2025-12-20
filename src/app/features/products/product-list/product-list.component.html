@@ -1,0 +1,52 @@
+<div class="product-list-container">
+  <div class="header-section">
+    <h1>Products Catalog</h1>
+    <button mat-raised-button color="primary" (click)="onAddProduct()">
+      <mat-icon>add</mat-icon>
+      Add Product
+    </button>
+  </div>
+
+  <div class="search-section">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Search products</mat-label>
+      <input 
+        matInput 
+        [(ngModel)]="searchQuery" 
+        (keyup)="onSearch()"
+        placeholder="Search by name...">
+      <mat-icon matPrefix>search</mat-icon>
+      <button 
+        mat-icon-button 
+        matSuffix 
+        *ngIf="searchQuery"
+        (click)="onClearSearch()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+  </div>
+
+  <div class="loading-section" *ngIf="loading">
+    <mat-spinner></mat-spinner>
+    <p>Loading products...</p>
+  </div>
+
+  <div class="empty-state" *ngIf="!loading && filteredProducts.length === 0">
+    <mat-icon>inventory_2</mat-icon>
+    <h2>No products found</h2>
+    <p *ngIf="searchQuery">Try a different search term</p>
+    <p *ngIf="!searchQuery">Start by adding your first product!</p>
+    <button mat-raised-button color="primary" (click)="onAddProduct()">
+      <mat-icon>add</mat-icon>
+      Add Product
+    </button>
+  </div>
+
+  <div class="products-grid" *ngIf="!loading && filteredProducts.length > 0">
+    <app-product-card 
+      *ngFor="let product of filteredProducts"
+      [product]="product"
+      (deleteProduct)="onDeleteProduct($event)">
+    </app-product-card>
+  </div>
+</div>

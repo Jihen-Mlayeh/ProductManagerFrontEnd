@@ -1,0 +1,48 @@
+<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>Product Manager</h3>
+        <p>Modern product management system</p>
+      </div>
+
+      <div class="footer-section">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a [routerLink]="['/products']">Products</a></li>
+          <li><a [routerLink]="['/auth/login']">Login</a></li>
+          <li><a [routerLink]="['/auth/signup']">Sign Up</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-section">
+        <h4>Contact</h4>
+       <p>
+  <mat-icon>email</mat-icon>
+  contact&#64;productmanager.com
+</p>
+        <p>
+          <mat-icon>phone</mat-icon>
+          +216 XX XXX XXX
+        </p>
+      </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <div class="footer-bottom">
+      <p>&copy; {{ currentYear }} Product Manager. All rights reserved.</p>
+      <div class="footer-social">
+        <button mat-icon-button>
+          <mat-icon>facebook</mat-icon>
+        </button>
+        <button mat-icon-button>
+          <mat-icon>twitter</mat-icon>
+        </button>
+        <button mat-icon-button>
+          <mat-icon>linkedin</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+</footer>

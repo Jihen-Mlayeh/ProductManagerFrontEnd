@@ -1,84 +1,194 @@
-<div class="product-form-container">
-  <div class="form-header">
-    <button mat-icon-button (click)="onCancel()">
-      <mat-icon>arrow_back</mat-icon>
-    </button>
-    <h1>{{ isEditMode ? 'Edit Product' : 'Add New Product' }}</h1>
+<div class="product-form-wrapper">
+  <div class="form-container">
+    <!-- Header -->
+    <div class="form-header">
+      <button 
+        mat-icon-button 
+        class="back-btn"
+        (click)="onCancel()"
+        matTooltip="Go back">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="header-content">
+        <h1 class="form-title">{{ isEditMode ? 'Edit Product' : 'Add New Product' }}</h1>
+        <p class="form-subtitle">{{ isEditMode ? 'Update product information' : 'Fill in the details below' }}</p>
+      </div>
+    </div>
+
+    <!-- Form Card -->
+    <mat-card class="form-card">
+      <mat-card-content>
+        <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+          
+          <!-- Product Name Section -->
+          <div class="form-section">
+            <h3 class="section-title">
+              <mat-icon>info</mat-icon>
+              Basic Information
+            </h3>
+
+            <mat-form-field appearance="outline" class="full-width modern-field">
+              <mat-label>Product Name</mat-label>
+              <input 
+                matInput 
+                formControlName="name"
+                placeholder="e.g., Wireless Mouse, Mechanical Keyboard..."
+                required>
+              <mat-icon matPrefix class="field-icon">inventory_2</mat-icon>
+              <mat-hint>Enter a descriptive name for your product</mat-hint>
+              <mat-error *ngIf="f['name'].errors?.['required']">
+                Product name is required
+              </mat-error>
+              <mat-error *ngIf="f['name'].errors?.['minlength']">
+                Name must be at least 3 characters
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Pricing Section -->
+          <div class="form-section">
+            <h3 class="section-title">
+              <mat-icon>euro</mat-icon>
+              Pricing
+            </h3>
+
+            <mat-form-field appearance="outline" class="full-width modern-field">
+              <mat-label>Price (EUR)</mat-label>
+              <input 
+                matInput 
+                type="number"
+                formControlName="price"
+                placeholder="0.00"
+                step="0.01"
+                min="0"
+                required>
+              <span matPrefix class="currency-prefix">€&nbsp;</span>
+              <mat-hint>Set the product price in euros</mat-hint>
+              <mat-error *ngIf="f['price'].errors?.['required']">
+                Price is required
+              </mat-error>
+              <mat-error *ngIf="f['price'].errors?.['min']">
+                Price must be 0 or greater
+              </mat-error>
+            </mat-form-field>
+
+            <!-- Price Preview -->
+            <div class="price-preview" *ngIf="f['price'].value && f['price'].value > 0">
+              <div class="preview-card">
+                <span class="preview-label">Price Preview</span>
+                <div class="preview-price">
+                  <span class="currency">€</span>
+                  <span class="amount">{{ f['price'].value | number:'1.2-2' }}</span>
+                </div>
+                <mat-chip 
+                  *ngIf="f['price'].value > 1000"
+                  class="premium-badge">
+                  <mat-icon>star</mat-icon>
+                  Premium Product
+                </mat-chip>
+              </div>
+            </div>
+          </div>
+
+          <!-- Expiration Section -->
+          <div class="form-section">
+            <h3 class="section-title">
+              <mat-icon>event</mat-icon>
+              Expiration (Optional)
+            </h3>
+
+            <mat-form-field appearance="outline" class="full-width modern-field">
+              <mat-label>Expiration Date</mat-label>
+              <input 
+                matInput 
+                [matDatepicker]="picker"
+                formControlName="expirationDate"
+                [min]="minDate"
+                placeholder="Select date">
+              <mat-icon matPrefix class="field-icon">calendar_today</mat-icon>
+              <mat-datepicker-toggle matSuffix [for]="picker">
+                <mat-icon matDatepickerToggleIcon>arrow_drop_down</mat-icon>
+              </mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+              <mat-hint>Leave empty if product doesn't expire</mat-hint>
+            </mat-form-field>
+
+            <!-- Expiration Info -->
+            <div class="expiration-info" *ngIf="f['expirationDate'].value">
+              <div class="info-card success">
+                <mat-icon>check_circle</mat-icon>
+                <div class="info-content">
+                  <span class="info-title">Expiration Date Set</span>
+                  <span class="info-text">
+                    Product will expire on {{ f['expirationDate'].value | date:'fullDate' }}
+                  </span>
+                  <span class="info-hint">
+                    {{ getDaysUntilExpiration() }} days from now
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="form-actions">
+            <button 
+              mat-stroked-button 
+              type="button"
+              class="cancel-btn"
+              (click)="onCancel()"
+              [disabled]="loading">
+              <mat-icon>close</mat-icon>
+              <span>Cancel</span>
+            </button>
+
+            <button 
+              mat-raised-button 
+              color="primary" 
+              type="submit"
+              class="submit-btn"
+              [disabled]="loading || productForm.invalid">
+              <mat-spinner 
+                *ngIf="loading" 
+                diameter="20" 
+                class="button-spinner">
+              </mat-spinner>
+              <span *ngIf="!loading">
+                <mat-icon>{{ isEditMode ? 'save' : 'add_circle' }}</mat-icon>
+                {{ isEditMode ? 'Update Product' : 'Create Product' }}
+              </span>
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Help Section -->
+    <div class="help-section">
+      <mat-card class="help-card">
+        <h4 class="help-title">
+          <mat-icon>lightbulb</mat-icon>
+          Quick Tips
+        </h4>
+        <ul class="help-list">
+          <li>
+            <mat-icon>check</mat-icon>
+            <span>Use descriptive names for better searchability</span>
+          </li>
+          <li>
+            <mat-icon>check</mat-icon>
+            <span>Products over €1000 are automatically marked as Premium</span>
+          </li>
+          <li>
+            <mat-icon>check</mat-icon>
+            <span>Set expiration dates for time-sensitive products</span>
+          </li>
+          <li>
+            <mat-icon>check</mat-icon>
+            <span>All fields except expiration date are required</span>
+          </li>
+        </ul>
+      </mat-card>
+    </div>
   </div>
-
-  <mat-card class="form-card">
-    <mat-card-content>
-      <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Product Name</mat-label>
-          <input 
-            matInput 
-            formControlName="name"
-            placeholder="Enter product name"
-            required>
-          <mat-icon matPrefix>inventory_2</mat-icon>
-          <mat-error *ngIf="f['name'].errors?.['required']">
-            Product name is required
-          </mat-error>
-          <mat-error *ngIf="f['name'].errors?.['minlength']">
-            Product name must be at least 3 characters
-          </mat-error>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Price</mat-label>
-          <input 
-            matInput 
-            type="number"
-            formControlName="price"
-            placeholder="Enter price"
-            required>
-          <span matPrefix>€&nbsp;</span>
-          <mat-error *ngIf="f['price'].errors?.['required']">
-            Price is required
-          </mat-error>
-          <mat-error *ngIf="f['price'].errors?.['min']">
-            Price must be greater than or equal to 0
-          </mat-error>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Expiration Date (Optional)</mat-label>
-          <input 
-            matInput 
-            [matDatepicker]="picker"
-            formControlName="expirationDate"
-            [min]="minDate"
-            placeholder="Select expiration date">
-          <mat-icon matPrefix>event</mat-icon>
-          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-          <mat-datepicker #picker></mat-datepicker>
-          <mat-hint>Leave empty if product doesn't expire</mat-hint>
-        </mat-form-field>
-
-        <div class="form-actions">
-          <button 
-            mat-raised-button 
-            color="primary" 
-            type="submit"
-            [disabled]="loading || productForm.invalid">
-            <mat-spinner *ngIf="loading" diameter="20" class="button-spinner"></mat-spinner>
-            <span *ngIf="!loading">
-              <mat-icon>{{ isEditMode ? 'save' : 'add' }}</mat-icon>
-              {{ isEditMode ? 'Update Product' : 'Create Product' }}
-            </span>
-          </button>
-
-          <button 
-            mat-stroked-button 
-            type="button"
-            (click)="onCancel()"
-            [disabled]="loading">
-            <mat-icon>close</mat-icon>
-            Cancel
-          </button>
-        </div>
-      </form>
-    </mat-card-content>
-  </mat-card>
 </div>

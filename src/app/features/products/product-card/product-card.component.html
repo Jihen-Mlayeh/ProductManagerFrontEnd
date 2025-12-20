@@ -1,35 +1,73 @@
 <mat-card class="product-card" [class.expired]="isExpired()">
-  <mat-card-header>
-    <mat-card-title>{{ product.name }}</mat-card-title>
-    <mat-card-subtitle *ngIf="product.expirationDate">
-      Expires: {{ product.expirationDate | date:'mediumDate' }}
-    </mat-card-subtitle>
-  </mat-card-header>
+  <!-- Product Image/Icon Section -->
+  <div class="card-image-section">
+    <div class="product-image">
+      <div class="image-placeholder">
+        <mat-icon>{{ getProductIcon() }}</mat-icon>
+      </div>
+      <div class="card-overlay">
+        <button mat-icon-button class="quick-view-btn" (click)="onViewDetails()">
+          <mat-icon>visibility</mat-icon>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Status Badge -->
+    <div class="status-badge" [class.expired]="isExpired()" [class.premium]="isPremium()">
+      <mat-icon *ngIf="isExpired()">schedule</mat-icon>
+      <mat-icon *ngIf="isPremium() && !isExpired()">star</mat-icon>
+      <span>{{ getStatusLabel() }}</span>
+    </div>
+  </div>
 
-  <mat-card-content>
-    <div class="price-section">
-      <span class="price">€{{ product.price | number:'1.2-2' }}</span>
-      <mat-chip *ngIf="isExpired()" color="warn">Expired</mat-chip>
-      <mat-chip *ngIf="!isExpired() && product.price > 1000" color="accent">Premium</mat-chip>
+  <!-- Product Info Section -->
+  <mat-card-content class="card-content">
+    <div class="product-header">
+      <h3 class="product-name">{{ product.name }}</h3>
+      <div class="product-price">
+        <span class="currency">€</span>
+        <span class="amount">{{ product.price | number:'1.0-0' }}</span>
+        <span class="decimals">.{{ getDecimals() }}</span>
+      </div>
     </div>
 
-    <div class="dates" *ngIf="product.createdAt">
-      <small>Created: {{ product.createdAt | date:'short' }}</small>
+    <div class="product-meta">
+      <div class="meta-item" *ngIf="product.expirationDate">
+        <mat-icon class="meta-icon">event</mat-icon>
+        <span class="meta-text">{{ getExpirationText() }}</span>
+      </div>
+      <div class="meta-item" *ngIf="product.createdAt">
+        <mat-icon class="meta-icon">access_time</mat-icon>
+        <span class="meta-text">{{ getCreatedText() }}</span>
+      </div>
     </div>
   </mat-card-content>
 
+  <!-- Card Actions -->
   <mat-card-actions class="card-actions">
-    <button mat-button color="primary" (click)="onViewDetails()">
+    <button 
+      mat-button 
+      class="action-btn view-btn"
+      (click)="onViewDetails()"
+      matTooltip="View details">
       <mat-icon>visibility</mat-icon>
-      View
+      <span>View</span>
     </button>
-    <button mat-button color="accent" (click)="onEdit()">
+    <button 
+      mat-button 
+      class="action-btn edit-btn"
+      (click)="onEdit()"
+      matTooltip="Edit product">
       <mat-icon>edit</mat-icon>
-      Edit
+      <span>Edit</span>
     </button>
-    <button mat-button color="warn" (click)="onDelete()">
+    <button 
+      mat-button 
+      class="action-btn delete-btn"
+      (click)="onDelete()"
+      matTooltip="Delete product">
       <mat-icon>delete</mat-icon>
-      Delete
+      <span>Delete</span>
     </button>
   </mat-card-actions>
 </mat-card>

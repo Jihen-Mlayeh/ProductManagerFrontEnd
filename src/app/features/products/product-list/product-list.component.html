@@ -1,52 +1,177 @@
-<div class="product-list-container">
-  <div class="header-section">
-    <h1>Products Catalog</h1>
-    <button mat-raised-button color="primary" (click)="onAddProduct()">
-      <mat-icon>add</mat-icon>
-      Add Product
-    </button>
-  </div>
-
-  <div class="search-section">
-    <mat-form-field appearance="outline" class="search-field">
-      <mat-label>Search products</mat-label>
-      <input 
-        matInput 
-        [(ngModel)]="searchQuery" 
-        (keyup)="onSearch()"
-        placeholder="Search by name...">
-      <mat-icon matPrefix>search</mat-icon>
+<div class="product-list-wrapper">
+  <!-- Hero Header Section -->
+  <div class="hero-header">
+    <div class="hero-content">
+      <div class="header-text">
+        <h1 class="hero-title">Products Catalog</h1>
+        <p class="hero-subtitle">Manage and organize your product inventory</p>
+      </div>
       <button 
-        mat-icon-button 
-        matSuffix 
-        *ngIf="searchQuery"
-        (click)="onClearSearch()">
-        <mat-icon>close</mat-icon>
+        mat-raised-button 
+        class="add-product-btn"
+        (click)="onAddProduct()">
+        <mat-icon>add_circle</mat-icon>
+        <span>Add Product</span>
       </button>
-    </mat-form-field>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-section">
+      <div class="stat-card">
+        <mat-icon class="stat-icon">inventory_2</mat-icon>
+        <div class="stat-content">
+          <span class="stat-value">{{ products.length }}</span>
+          <span class="stat-label">Total Products</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <mat-icon class="stat-icon accent">star</mat-icon>
+        <div class="stat-content">
+          <span class="stat-value">{{ getPremiumCount() }}</span>
+          <span class="stat-label">Premium Items</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <mat-icon class="stat-icon warning">schedule</mat-icon>
+        <div class="stat-content">
+          <span class="stat-value">{{ getExpiredCount() }}</span>
+          <span class="stat-label">Expired</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <mat-icon class="stat-icon success">euro</mat-icon>
+        <div class="stat-content">
+          <span class="stat-value">€{{ getTotalValue() | number:'1.0-0' }}</span>
+          <span class="stat-label">Total Value</span>
+        </div>
+      </div>
+    </div>
   </div>
 
+  <!-- Filters and Search Section -->
+  <div class="filters-section">
+    <div class="search-bar">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-icon matPrefix class="search-icon">search</mat-icon>
+        <input 
+          matInput 
+          [(ngModel)]="searchQuery" 
+          (keyup)="onSearch()"
+          placeholder="Search products by name...">
+        <button 
+          mat-icon-button 
+          matSuffix 
+          *ngIf="searchQuery"
+          (click)="onClearSearch()"
+          class="clear-btn">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
+    </div>
+
+    <div class="filter-controls">
+      <!-- Status Filter -->
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Status</mat-label>
+        <mat-select [(ngModel)]="statusFilter" (selectionChange)="onFilterChange()">
+          <mat-option value="all">All Products</mat-option>
+          <mat-option value="active">Active Only</mat-option>
+          <mat-option value="expired">Expired Only</mat-option>
+          <mat-option value="premium">Premium Only</mat-option>
+        </mat-select>
+        <mat-icon matPrefix>filter_list</mat-icon>
+      </mat-form-field>
+
+      <!-- Sort By -->
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Sort by</mat-label>
+        <mat-select [(ngModel)]="sortBy" (selectionChange)="onSortChange()">
+          <mat-option value="name-asc">Name (A-Z)</mat-option>
+          <mat-option value="name-desc">Name (Z-A)</mat-option>
+          <mat-option value="price-asc">Price (Low to High)</mat-option>
+          <mat-option value="price-desc">Price (High to Low)</mat-option>
+          <mat-option value="date-desc">Newest First</mat-option>
+          <mat-option value="date-asc">Oldest First</mat-option>
+        </mat-select>
+        <mat-icon matPrefix>sort</mat-icon>
+      </mat-form-field>
+
+      <!-- View Toggle -->
+      <div class="view-toggle">
+        <button 
+          mat-icon-button 
+          [class.active]="viewMode === 'grid'"
+          (click)="setViewMode('grid')"
+          matTooltip="Grid view">
+          <mat-icon>grid_view</mat-icon>
+        </button>
+        <button 
+          mat-icon-button 
+          [class.active]="viewMode === 'list'"
+          (click)="setViewMode('list')"
+          matTooltip="List view">
+          <mat-icon>view_list</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
   <div class="loading-section" *ngIf="loading">
-    <mat-spinner></mat-spinner>
-    <p>Loading products...</p>
+    <div class="loading-content">
+      <mat-spinner diameter="60"></mat-spinner>
+      <p class="loading-text">Loading products...</p>
+    </div>
   </div>
 
-  <div class="empty-state" *ngIf="!loading && filteredProducts.length === 0">
-    <mat-icon>inventory_2</mat-icon>
-    <h2>No products found</h2>
-    <p *ngIf="searchQuery">Try a different search term</p>
-    <p *ngIf="!searchQuery">Start by adding your first product!</p>
-    <button mat-raised-button color="primary" (click)="onAddProduct()">
-      <mat-icon>add</mat-icon>
-      Add Product
-    </button>
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!loading && paginatedProducts.length === 0">
+    <div class="empty-content">
+      <div class="empty-icon">
+        <mat-icon>{{ searchQuery ? 'search_off' : 'inventory_2' }}</mat-icon>
+      </div>
+      <h2 class="empty-title">{{ searchQuery ? 'No products found' : 'No products yet' }}</h2>
+      <p class="empty-description">
+        {{ searchQuery 
+          ? 'Try adjusting your search or filters' 
+          : 'Start by adding your first product to the catalog' }}
+      </p>
+      <button 
+        mat-raised-button 
+        color="primary"
+        class="empty-action-btn"
+        (click)="searchQuery ? onClearSearch() : onAddProduct()">
+        <mat-icon>{{ searchQuery ? 'refresh' : 'add_circle' }}</mat-icon>
+        <span>{{ searchQuery ? 'Clear Search' : 'Add First Product' }}</span>
+      </button>
+    </div>
   </div>
 
-  <div class="products-grid" *ngIf="!loading && filteredProducts.length > 0">
-    <app-product-card 
-      *ngFor="let product of filteredProducts"
-      [product]="product"
-      (deleteProduct)="onDeleteProduct($event)">
-    </app-product-card>
+  <!-- Products Grid/List -->
+  <div class="products-container" *ngIf="!loading && paginatedProducts.length > 0">
+    <div class="products-grid" [class.list-view]="viewMode === 'list'">
+      <app-product-card 
+        *ngFor="let product of paginatedProducts"
+        [product]="product"
+        (deleteProduct)="onDeleteProduct($event)">
+      </app-product-card>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-section">
+      <div class="pagination-info">
+        <span class="info-text">
+          Showing {{ getStartIndex() }}-{{ getEndIndex() }} of {{ filteredProducts.length }} products
+        </span>
+      </div>
+
+      <mat-paginator
+        [length]="filteredProducts.length"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="onPageChange($event)"
+        showFirstLastButtons>
+      </mat-paginator>
+    </div>
   </div>
 </div>

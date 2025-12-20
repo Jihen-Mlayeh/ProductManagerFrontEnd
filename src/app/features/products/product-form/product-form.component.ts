@@ -113,4 +113,17 @@ export class ProductFormComponent implements OnInit {
       this.router.navigate(['/products']);
     }
   }
+  // Dans product-form.component.ts, ajoute cette méthode à la fin (avant le dernier })
+
+getDaysUntilExpiration(): number {
+  const expDate = this.f['expirationDate'].value;
+  if (!expDate) return 0;
+  
+  const today = new Date();
+  const expirationDate = new Date(expDate);
+  const diffTime = expirationDate.getTime() - today.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  
+  return diffDays;
+}
 }

@@ -1,46 +1,85 @@
+// ===== MODERN FOOTER STYLES =====
+
+// Variables
+$gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+$text-white: #ffffff;
+$text-white-muted: rgba(255, 255, 255, 0.8);
+$divider-color: rgba(255, 255, 255, 0.15);
+
 .footer {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 40px 0 20px;
+  background: $gradient-primary;
+  color: $text-white;
+  padding: 60px 0 24px;
   margin-top: auto;
+  position: relative;
+  overflow: hidden;
+
+  // Decorative background pattern
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+  }
 }
 
 .footer-container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 16px;
+  padding: 0 24px;
+  position: relative;
+  z-index: 1;
 }
 
 .footer-content {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 32px;
-  margin-bottom: 32px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 48px;
+  margin-bottom: 48px;
 
   .footer-section {
     h3 {
-      font-size: 24px;
-      font-weight: 600;
-      margin-bottom: 12px;
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      letter-spacing: -0.5px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
 
     h4 {
       font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 12px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      opacity: 0.9;
     }
 
-    p {
+    > p {
       display: flex;
       align-items: center;
-      gap: 8px;
-      margin: 8px 0;
-      opacity: 0.9;
+      gap: 10px;
+      margin: 12px 0;
+      opacity: 0.85;
+      font-size: 15px;
+      line-height: 1.6;
+      transition: all 0.3s ease;
+
+      &:hover {
+        opacity: 1;
+        transform: translateX(4px);
+      }
 
       mat-icon {
-        font-size: 20px;
-        width: 20px;
-        height: 20px;
+        font-size: 22px;
+        width: 22px;
+        height: 22px;
+        flex-shrink: 0;
       }
     }
 
@@ -50,39 +89,79 @@
       margin: 0;
 
       li {
-        margin: 8px 0;
+        margin: 12px 0;
+        transition: all 0.3s ease;
+
+        &:hover {
+          transform: translateX(4px);
+        }
 
         a {
-          color: white;
+          color: $text-white;
           text-decoration: none;
-          opacity: 0.9;
-          transition: opacity 0.3s;
+          opacity: 0.85;
+          transition: all 0.3s ease;
+          font-size: 15px;
+          font-weight: 500;
+          display: inline-block;
+          position: relative;
+
+          &::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: $text-white;
+            transition: width 0.3s ease;
+          }
 
           &:hover {
             opacity: 1;
-            text-decoration: underline;
+
+            &::after {
+              width: 100%;
+            }
           }
         }
       }
     }
   }
+
+  // First section (brand) styling
+  .footer-section:first-child {
+    p {
+      font-size: 16px;
+      line-height: 1.6;
+      margin-top: 8px;
+    }
+  }
 }
 
+// Divider styling
 mat-divider {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: $divider-color;
+  height: 2px;
+}
+
+::ng-deep .footer mat-divider {
+  background-color: $divider-color;
 }
 
 .footer-bottom {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 20px;
+  padding-top: 32px;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 20px;
 
   p {
     margin: 0;
-    opacity: 0.9;
+    opacity: 0.8;
+    font-size: 14px;
+    font-weight: 500;
   }
 
   .footer-social {
@@ -90,18 +169,143 @@ mat-divider {
     gap: 8px;
 
     button {
-      color: white;
+      width: 44px;
+      height: 44px;
+      color: $text-white;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 50%;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+
+      mat-icon {
+        font-size: 22px;
+      }
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-4px) scale(1.1);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      }
+
+      &:active {
+        transform: translateY(-2px) scale(1.05);
+      }
     }
   }
 }
 
+// Responsive
+@media (max-width: 992px) {
+  .footer {
+    padding: 48px 0 20px;
+  }
+
+  .footer-content {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+    margin-bottom: 40px;
+  }
+}
+
 @media (max-width: 768px) {
+  .footer {
+    padding: 40px 0 20px;
+  }
+
+  .footer-container {
+    padding: 0 16px;
+  }
+
   .footer-content {
     grid-template-columns: 1fr;
+    gap: 32px;
+    margin-bottom: 32px;
+
+    .footer-section {
+      text-align: center;
+
+      h3 {
+        font-size: 24px;
+      }
+
+      h4 {
+        font-size: 16px;
+      }
+
+      > p {
+        justify-content: center;
+      }
+
+      ul li {
+        &:hover {
+          transform: none;
+        }
+
+        a:hover {
+          transform: scale(1.05);
+        }
+      }
+    }
   }
 
   .footer-bottom {
     flex-direction: column;
     text-align: center;
+    padding-top: 24px;
+    gap: 16px;
+
+    p {
+      font-size: 13px;
+    }
   }
+}
+
+@media (max-width: 480px) {
+  .footer-content {
+    .footer-section {
+      h3 {
+        font-size: 22px;
+      }
+
+      h4 {
+        font-size: 15px;
+      }
+
+      > p,
+      ul li a {
+        font-size: 14px;
+      }
+    }
+  }
+
+  .footer-bottom .footer-social button {
+    width: 40px;
+    height: 40px;
+
+    mat-icon {
+      font-size: 20px;
+    }
+  }
+}
+
+// Animation on scroll (optional)
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.footer-content .footer-section {
+  animation: fadeInUp 0.6s ease-out;
+  animation-fill-mode: both;
+
+  &:nth-child(1) { animation-delay: 0.1s; }
+  &:nth-child(2) { animation-delay: 0.2s; }
+  &:nth-child(3) { animation-delay: 0.3s; }
 }

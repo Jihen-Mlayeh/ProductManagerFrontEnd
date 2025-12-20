@@ -1,86 +1,232 @@
-<div class="product-detail-container">
+<div class="product-detail-wrapper">
+  <!-- Loading State -->
   <div class="loading-section" *ngIf="loading">
-    <mat-spinner></mat-spinner>
-    <p>Loading product...</p>
+    <mat-spinner diameter="60"></mat-spinner>
+    <p class="loading-text">Loading product details...</p>
   </div>
 
-  <div class="product-detail" *ngIf="!loading && product">
+  <!-- Product Detail -->
+  <div class="product-detail-container" *ngIf="!loading && product">
+    <!-- Header with Back Button -->
     <div class="detail-header">
-      <button mat-icon-button (click)="onBack()">
+      <button 
+        mat-icon-button 
+        class="back-btn"
+        (click)="onBack()"
+        matTooltip="Back to products">
         <mat-icon>arrow_back</mat-icon>
       </button>
-      <h1>Product Details</h1>
+      <div class="header-title">
+        <h1>Product Details</h1>
+        <span class="product-id">ID: {{ product.id }}</span>
+      </div>
     </div>
 
-    <mat-card class="detail-card">
-      <mat-card-header>
-        <mat-card-title class="product-name">
-          {{ product.name }}
-          <mat-chip *ngIf="isExpired()" color="warn">Expired</mat-chip>
-          <mat-chip *ngIf="!isExpired() && product.price > 1000" color="accent">Premium</mat-chip>
-        </mat-card-title>
-      </mat-card-header>
-
-      <mat-card-content>
-        <div class="detail-grid">
-          <div class="detail-item">
-            <mat-icon>tag</mat-icon>
-            <div class="detail-info">
-              <span class="label">Product ID</span>
-              <span class="value">{{ product.id }}</span>
-            </div>
+    <!-- Main Content Grid -->
+    <div class="detail-content">
+      <!-- Product Image Card -->
+      <div class="image-section">
+        <div class="product-image-large">
+          <div class="image-placeholder">
+            <mat-icon>{{ getProductIcon() }}</mat-icon>
           </div>
-
-          <div class="detail-item">
-            <mat-icon>euro</mat-icon>
-            <div class="detail-info">
-              <span class="label">Price</span>
-              <span class="value price">€{{ product.price | number:'1.2-2' }}</span>
-            </div>
-          </div>
-
-          <div class="detail-item" *ngIf="product.expirationDate">
-            <mat-icon>event</mat-icon>
-            <div class="detail-info">
-              <span class="label">Expiration Date</span>
-              <span class="value" [class.expired]="isExpired()">
-                {{ product.expirationDate | date:'fullDate' }}
-              </span>
-            </div>
-          </div>
-
-          <div class="detail-item" *ngIf="product.createdAt">
-            <mat-icon>schedule</mat-icon>
-            <div class="detail-info">
-              <span class="label">Created At</span>
-              <span class="value">{{ product.createdAt | date:'medium' }}</span>
-            </div>
-          </div>
-
-          <div class="detail-item" *ngIf="product.updatedAt">
-            <mat-icon>update</mat-icon>
-            <div class="detail-info">
-              <span class="label">Last Updated</span>
-              <span class="value">{{ product.updatedAt | date:'medium' }}</span>
+          
+          <!-- Status Badge -->
+          <div class="status-badges">
+            <div 
+              class="status-badge" 
+              [class.expired]="isExpired()" 
+              [class.premium]="isPremium()"
+              [class.active]="!isExpired() && !isPremium()">
+              <mat-icon>{{ getStatusIcon() }}</mat-icon>
+              <span>{{ getStatusLabel() }}</span>
             </div>
           </div>
         </div>
-      </mat-card-content>
 
-      <mat-card-actions class="detail-actions">
-        <button mat-raised-button color="primary" (click)="onEdit()">
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+          <button 
+            mat-raised-button 
+            color="primary"
+            class="action-btn"
+            (click)="onEdit()">
+            <mat-icon>edit</mat-icon>
+            <span>Edit Product</span>
+          </button>
+          <button 
+            mat-raised-button 
+            color="warn"
+            class="action-btn"
+            (click)="onDelete()">
+            <mat-icon>delete</mat-icon>
+            <span>Delete</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Product Information -->
+      <div class="info-section">
+        <!-- Product Name and Price -->
+        <div class="product-header-card">
+          <div class="name-section">
+            <h2 class="product-name">{{ product.name }}</h2>
+            <div class="product-tags">
+              <mat-chip *ngIf="isExpired()" class="chip-expired">
+                <mat-icon>schedule</mat-icon>
+                Expired
+              </mat-chip>
+              <mat-chip *ngIf="isPremium() && !isExpired()" class="chip-premium">
+                <mat-icon>star</mat-icon>
+                Premium
+              </mat-chip>
+              <mat-chip *ngIf="!isExpired() && !isPremium()" class="chip-active">
+                <mat-icon>check_circle</mat-icon>
+                Active
+              </mat-chip>
+            </div>
+          </div>
+
+          <div class="price-section">
+            <span class="price-label">Price</span>
+            <div class="price-value">
+              <span class="currency">€</span>
+              <span class="amount">{{ product.price | number:'1.2-2' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Information Grid -->
+        <div class="info-grid">
+          <!-- ID Card -->
+          <mat-card class="info-card">
+            <div class="card-icon primary">
+              <mat-icon>fingerprint</mat-icon>
+            </div>
+            <div class="card-content">
+              <span class="card-label">Product ID</span>
+              <span class="card-value">{{ product.id }}</span>
+            </div>
+          </mat-card>
+
+          <!-- Price Card -->
+          <mat-card class="info-card">
+            <div class="card-icon success">
+              <mat-icon>euro</mat-icon>
+            </div>
+            <div class="card-content">
+              <span class="card-label">Unit Price</span>
+              <span class="card-value price">€{{ product.price | number:'1.2-2' }}</span>
+            </div>
+          </mat-card>
+
+          <!-- Expiration Card -->
+          <mat-card class="info-card" *ngIf="product.expirationDate">
+            <div class="card-icon" [class.warning]="!isExpired()" [class.error]="isExpired()">
+              <mat-icon>event</mat-icon>
+            </div>
+            <div class="card-content">
+              <span class="card-label">Expiration Date</span>
+              <span class="card-value" [class.expired-text]="isExpired()">
+                {{ product.expirationDate | date:'fullDate' }}
+              </span>
+              <span class="card-hint" [class.expired-hint]="isExpired()">
+                {{ getExpirationText() }}
+              </span>
+            </div>
+          </mat-card>
+
+          <!-- Created Date Card -->
+          <mat-card class="info-card" *ngIf="product.createdAt">
+            <div class="card-icon accent">
+              <mat-icon>add_circle</mat-icon>
+            </div>
+            <div class="card-content">
+              <span class="card-label">Created</span>
+              <span class="card-value">{{ product.createdAt | date:'medium' }}</span>
+              <span class="card-hint">{{ getCreatedText() }}</span>
+            </div>
+          </mat-card>
+
+          <!-- Updated Date Card -->
+          <mat-card class="info-card" *ngIf="product.updatedAt">
+            <div class="card-icon info">
+              <mat-icon>update</mat-icon>
+            </div>
+            <div class="card-content">
+              <span class="card-label">Last Updated</span>
+              <span class="card-value">{{ product.updatedAt | date:'medium' }}</span>
+              <span class="card-hint">{{ getUpdatedText() }}</span>
+            </div>
+          </mat-card>
+
+          <!-- Category Card -->
+          <mat-card class="info-card">
+            <div class="card-icon primary">
+              <mat-icon>category</mat-icon>
+            </div>
+            <div class="card-content">
+              <span class="card-label">Category</span>
+              <span class="card-value">{{ getProductCategory() }}</span>
+            </div>
+          </mat-card>
+        </div>
+
+        <!-- Additional Info Section -->
+        <mat-card class="additional-info">
+          <h3 class="section-title">
+            <mat-icon>info</mat-icon>
+            Additional Information
+          </h3>
+          <div class="info-list">
+            <div class="info-item">
+              <span class="item-label">Status:</span>
+              <span class="item-value" [class.expired-text]="isExpired()">
+                {{ isExpired() ? 'Expired Product' : 'Active Product' }}
+              </span>
+            </div>
+            <div class="info-item" *ngIf="isPremium()">
+              <span class="item-label">Classification:</span>
+              <span class="item-value premium-text">Premium Product (€1000+)</span>
+            </div>
+            <div class="info-item">
+              <span class="item-label">Days Since Creation:</span>
+              <span class="item-value">{{ getDaysSinceCreation() }} days</span>
+            </div>
+            <div class="info-item" *ngIf="product.expirationDate && !isExpired()">
+              <span class="item-label">Days Until Expiration:</span>
+              <span class="item-value">{{ getDaysUntilExpiration() }} days</span>
+            </div>
+          </div>
+        </mat-card>
+      </div>
+    </div>
+
+    <!-- Bottom Actions -->
+    <div class="bottom-actions">
+      <button 
+        mat-stroked-button 
+        class="secondary-btn"
+        (click)="onBack()">
+        <mat-icon>arrow_back</mat-icon>
+        <span>Back to Products</span>
+      </button>
+      <div class="action-group">
+        <button 
+          mat-raised-button 
+          color="primary"
+          (click)="onEdit()">
           <mat-icon>edit</mat-icon>
-          Edit Product
+          <span>Edit Product</span>
         </button>
-        <button mat-raised-button color="warn" (click)="onDelete()">
+        <button 
+          mat-raised-button 
+          color="warn"
+          (click)="onDelete()">
           <mat-icon>delete</mat-icon>
-          Delete Product
+          <span>Delete Product</span>
         </button>
-        <button mat-stroked-button (click)="onBack()">
-          <mat-icon>arrow_back</mat-icon>
-          Back to List
-        </button>
-      </mat-card-actions>
-    </mat-card>
+      </div>
+    </div>
   </div>
 </div>

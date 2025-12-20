@@ -1,8 +1,12 @@
+// ===== AJOUTER CES PROPRIÉTÉS ET MÉTHODES À VOTRE product-list.component.ts =====
+// GARDEZ TOUT VOTRE CODE EXISTANT, ajoutez juste ces éléments
+
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ProductService } from '../../../core/services/product.service';
 import { Product } from '../../../core/models/product';
 import { ToastrService } from 'ngx-toastr';
+import { PageEvent } from '@angular/material/paginator'; // ⬅️ AJOUTER CET IMPORT
 import Swal from 'sweetalert2';
 
 @Component({
@@ -12,10 +16,22 @@ import Swal from 'sweetalert2';
   styleUrls: ['./product-list.component.scss']
 })
 export class ProductListComponent implements OnInit {
+  // ===== VOS PROPRIÉTÉS EXISTANTES (gardez-les) =====
   products: Product[] = [];
   filteredProducts: Product[] = [];
   loading = false;
   searchQuery = '';
+
+  // ===== NOUVELLES PROPRIÉTÉS À AJOUTER =====
+  paginatedProducts: Product[] = [];      // Produits de la page actuelle
+  statusFilter = 'all';                   // Filtre de statut
+  sortBy = 'name-asc';                    // Option de tri
+  viewMode: 'grid' | 'list' = 'grid';     // Mode d'affichage
+  
+  // Pagination
+  pageSize = 12;                          // Produits par page
+  pageIndex = 0;                          // Page actuelle
+  pageSizeOptions = [6, 12, 24, 48];      // Options de pagination
 
   constructor(
     private productService: ProductService,
@@ -27,12 +43,13 @@ export class ProductListComponent implements OnInit {
     this.loadProducts();
   }
 
+  // ===== MODIFIER VOTRE MÉTHODE loadProducts() =====
   loadProducts(): void {
     this.loading = true;
     this.productService.getAllProducts().subscribe({
       next: (products) => {
         this.products = products;
-        this.filteredProducts = products;
+        this.applyFiltersAndSort(); // ⬅️ Changer cette ligne
         this.loading = false;
       },
       error: (error) => {
@@ -42,26 +59,24 @@ export class ProductListComponent implements OnInit {
     });
   }
 
+  // ===== MODIFIER VOTRE MÉTHODE onSearch() =====
   onSearch(): void {
-    if (!this.searchQuery.trim()) {
-      this.filteredProducts = this.products;
-      return;
-    }
-
-    this.filteredProducts = this.products.filter(product =>
-      product.name.toLowerCase().includes(this.searchQuery.toLowerCase())
-    );
+    this.pageIndex = 0; // Reset à la première page
+    this.applyFiltersAndSort();
   }
 
+  // ===== GARDER VOTRE onClearSearch() =====
   onClearSearch(): void {
     this.searchQuery = '';
-    this.filteredProducts = this.products;
+    this.onSearch();
   }
 
+  // ===== GARDER VOTRE onAddProduct() =====
   onAddProduct(): void {
     this.router.navigate(['/products/new']);
   }
 
+  // ===== MODIFIER LÉGÈREMENT VOTRE onDeleteProduct() =====
   onDeleteProduct(id: number): void {
     Swal.fire({
       title: 'Are you sure?',
@@ -84,5 +99,125 @@ export class ProductListComponent implements OnInit {
         });
       }
     });
+  }
+
+  // ===== NOUVELLES MÉTHODES À AJOUTER =====
+
+  // Applique les filtres, recherche et tri
+  applyFiltersAndSort(): void {
+    let filtered = [...this.products];
+
+    // Appliquer la recherche
+    if (this.searchQuery) {
+      const query = this.searchQuery.toLowerCase();
+      filtered = filtered.filter(p => 
+        p.name.toLowerCase().includes(query)
+      );
+    }
+
+    // Appliquer le filtre de statut
+    switch (this.statusFilter) {
+      case 'active':
+        filtered = filtered.filter(p => !this.isProductExpired(p));
+        break;
+      case 'expired':
+        filtered = filtered.filter(p => this.isProductExpired(p));
+        break;
+      case 'premium':
+        filtered = filtered.filter(p => p.price > 1000);
+        break;
+    }
+
+    // Appliquer le tri
+    filtered = this.sortProducts(filtered);
+
+    this.filteredProducts = filtered;
+    this.updatePaginatedProducts();
+  }
+
+  // Trier les produits
+  sortProducts(products: Product[]): Product[] {
+    switch (this.sortBy) {
+      case 'name-asc':
+        return products.sort((a, b) => a.name.localeCompare(b.name));
+      case 'name-desc':
+        return products.sort((a, b) => b.name.localeCompare(a.name));
+      case 'price-asc':
+        return products.sort((a, b) => a.price - b.price);
+      case 'price-desc':
+        return products.sort((a, b) => b.price - a.price);
+      case 'date-asc':
+        return products.sort((a, b) => 
+          new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime()
+        );
+      case 'date-desc':
+        return products.sort((a, b) => 
+          new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+        );
+      default:
+        return products;
+    }
+  }
+
+  // Gérer le changement de filtre
+  onFilterChange(): void {
+    this.pageIndex = 0;
+    this.applyFiltersAndSort();
+  }
+
+  // Gérer le changement de tri
+  onSortChange(): void {
+    this.applyFiltersAndSort();
+  }
+
+  // Gérer le changement de page
+  onPageChange(event: PageEvent): void {
+    this.pageSize = event.pageSize;
+    this.pageIndex = event.pageIndex;
+    this.updatePaginatedProducts();
+  }
+
+  // Mettre à jour les produits paginés
+  updatePaginatedProducts(): void {
+    const startIndex = this.pageIndex * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+    this.paginatedProducts = this.filteredProducts.slice(startIndex, endIndex);
+  }
+
+  // Obtenir l'index de début
+  getStartIndex(): number {
+    return this.filteredProducts.length === 0 ? 0 : (this.pageIndex * this.pageSize) + 1;
+  }
+
+  // Obtenir l'index de fin
+  getEndIndex(): number {
+    const end = (this.pageIndex + 1) * this.pageSize;
+    return Math.min(end, this.filteredProducts.length);
+  }
+
+  // Changer le mode d'affichage
+  setViewMode(mode: 'grid' | 'list'): void {
+    this.viewMode = mode;
+  }
+
+  // Compter les produits premium
+  getPremiumCount(): number {
+    return this.products.filter(p => p.price > 1000).length;
+  }
+
+  // Compter les produits expirés
+  getExpiredCount(): number {
+    return this.products.filter(p => this.isProductExpired(p)).length;
+  }
+
+  // Calculer la valeur totale
+  getTotalValue(): number {
+    return this.products.reduce((sum, p) => sum + p.price, 0);
+  }
+
+  // Vérifier si un produit est expiré
+  isProductExpired(product: Product): boolean {
+    if (!product.expirationDate) return false;
+    return new Date(product.expirationDate) < new Date();
   }
 }

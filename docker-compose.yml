@@ -4,9 +4,10 @@ services:
   jaeger:
     image: jaegertracing/all-in-one:latest
     ports:
-      - "16686:16686"
-      - "4318:4318"
-      - "14250:14250"
+      - "16686:16686"  # Jaeger UI
+      - "4317:4317"    # ✅ OTLP gRPC - EXPOSE LE PORT!
+      - "4318:4318"    # OTLP HTTP
+      - "14250:14250"  # Jaeger gRPC
     environment:
       - COLLECTOR_OTLP_ENABLED=true
       - LOG_LEVEL=debug

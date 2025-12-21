@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, tap, map } from 'rxjs/operators';
 
@@ -15,13 +15,34 @@ export class ProductService {
   constructor(private http: HttpClient) {}
 
   /**
+   * Récupère les headers utilisateur depuis localStorage
+   */
+  private getUserHeaders(): HttpHeaders {
+    const userJson = localStorage.getItem('currentUser');
+    let headers = new HttpHeaders();
+    
+    if (userJson) {
+      try {
+        const user = JSON.parse(userJson);
+        headers = headers
+          .set('X-User-Name', user.name || 'Unknown')
+          .set('X-User-Email', user.email || 'unknown@email.com');
+      } catch (e) {
+        console.warn('Failed to parse user from localStorage');
+      }
+    }
+    
+    return headers;
+  }
+
+  /**
    * Mapper centralisé: _id → id
    */
   private mapProduct(p: any): Product {
     return {
       ...p,
-      id: p._id || p.id,  // ✅ Support _id ET id
-      _id: p._id          // ✅ Garde aussi _id
+      id: p._id || p.id,
+      _id: p._id
     };
   }
 
@@ -29,7 +50,9 @@ export class ProductService {
    * Obtenir tous les produits
    */
   getAllProducts(): Observable<Product[]> {
-    return this.http.get<any[]>(this.API_URL).pipe(
+    return this.http.get<any[]>(this.API_URL, {
+      headers: this.getUserHeaders()
+    }).pipe(
       map(products => products.map(p => this.mapProduct(p))),
       tap(products => console.log('✅ Products fetched:', products.length)),
       catchError(this.handleError)
@@ -40,7 +63,9 @@ export class ProductService {
    * Obtenir un produit par ID
    */
   getProductById(id: string): Observable<Product> {
-    return this.http.get<any>(`${this.API_URL}/${id}`).pipe(
+    return this.http.get<any>(`${this.API_URL}/${id}`, {
+      headers: this.getUserHeaders()
+    }).pipe(
       map(p => this.mapProduct(p)),
       tap(product => console.log('✅ Product fetched:', product)),
       catchError(this.handleError)
@@ -52,7 +77,9 @@ export class ProductService {
    */
   createProduct(product: ProductCreateRequest): Observable<Product> {
     console.log('📤 Creating product:', product);
-    return this.http.post<any>(this.API_URL, product).pipe(
+    return this.http.post<any>(this.API_URL, product, {
+      headers: this.getUserHeaders()
+    }).pipe(
       map(p => this.mapProduct(p)),
       tap(created => console.log('✅ Product created:', created)),
       catchError(this.handleError)
@@ -64,7 +91,9 @@ export class ProductService {
    */
   updateProduct(id: string, product: ProductUpdateRequest): Observable<Product> {
     console.log('📤 Updating product:', id, product);
-    return this.http.put<any>(`${this.API_URL}/${id}`, product).pipe(
+    return this.http.put<any>(`${this.API_URL}/${id}`, product, {
+      headers: this.getUserHeaders()
+    }).pipe(
       map(p => this.mapProduct(p)),
       tap(updated => console.log('✅ Product updated:', updated)),
       catchError(this.handleError)
@@ -72,17 +101,18 @@ export class ProductService {
   }
 
   /**
- * Supprimer un produit
- */
-deleteProduct(id: string): Observable<void> {
-  return this.http.delete(`${this.API_URL}/${id}`, { 
-    responseType: 'text' as 'json'  // ✅ Accepte du texte au lieu de JSON
-  }).pipe(
-    map(() => undefined),  // ✅ Convertit en void
-    tap(() => console.log('✅ Product deleted:', id)),
-    catchError(this.handleError)
-  );
-}
+   * Supprimer un produit
+   */
+  deleteProduct(id: string): Observable<void> {
+    return this.http.delete(`${this.API_URL}/${id}`, { 
+      headers: this.getUserHeaders(),
+      responseType: 'text' as 'json'
+    }).pipe(
+      map(() => undefined),
+      tap(() => console.log('✅ Product deleted:', id)),
+      catchError(this.handleError)
+    );
+  }
 
   /**
    * Gestion des erreurs
@@ -99,5 +129,4 @@ deleteProduct(id: string): Observable<void> {
     
     return throwError(() => new Error(errorMessage));
   }
-  
 }

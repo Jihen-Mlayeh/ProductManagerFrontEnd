@@ -22,7 +22,7 @@ import { SharedModule } from './shared/shared.module';
 
 // Interceptor
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
-
+import { TelemetryInterceptor } from './core/interceptors/telemetry.interceptor';
 @NgModule({
   declarations: [
     AppComponent
@@ -57,7 +57,8 @@ import { AuthInterceptor } from './core/interceptors/auth.interceptor';
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
       multi: true
-    }
+    },
+    { provide: HTTP_INTERCEPTORS, useClass: TelemetryInterceptor, multi: true }
   ],
   bootstrap: [AppComponent]
 })

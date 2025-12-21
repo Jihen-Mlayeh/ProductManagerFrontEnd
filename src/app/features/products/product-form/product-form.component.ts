@@ -15,7 +15,7 @@ export class ProductFormComponent implements OnInit {
   productForm!: FormGroup;
   loading = false;
   isEditMode = false;
-  productId: number | null = null;
+  productId: string | null = null;
   minDate = new Date();
 
   constructor(
@@ -32,7 +32,7 @@ export class ProductFormComponent implements OnInit {
     this.route.params.subscribe(params => {
       if (params['id']) {
         this.isEditMode = true;
-        this.productId = +params['id'];
+        this.productId = params['id'];
         this.loadProduct();
       }
     });

@@ -10,7 +10,7 @@ import { Product } from '../../../core/models/product';
 })
 export class ProductCardComponent {
   @Input() product!: Product;
-  @Output() deleteProduct = new EventEmitter<number>();
+  @Output() deleteProduct = new EventEmitter<string>();
 
   constructor(private router: Router) {}
 

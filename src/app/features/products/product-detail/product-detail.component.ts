@@ -18,18 +18,19 @@ export class ProductDetailComponent implements OnInit {
   // ===== TOUTES VOS PROPRIÉTÉS EXISTANTES (ne changez rien) =====
   product: Product | null = null;
   loading = false;
-  productId!: number;
+  productId!: string;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
+
     private productService: ProductService,
     private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
-      this.productId = +params['id'];
+      this.productId = params['id'];
       this.loadProduct();
     });
   }

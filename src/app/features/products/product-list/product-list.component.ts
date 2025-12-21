@@ -76,34 +76,44 @@ export class ProductListComponent implements OnInit {
     this.router.navigate(['/products/new']);
   }
 
-  // ===== MODIFIER LÉGÈREMENT VOTRE onDeleteProduct() =====
-  onDeleteProduct(id: number): void {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: 'You won\'t be able to revert this!',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, delete it!'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.productService.deleteProduct(id).subscribe({
-          next: () => {
-            this.toastr.success('Product deleted successfully', 'Success');
-            this.loadProducts();
-          },
-          error: (error) => {
-            this.toastr.error('Failed to delete product', 'Error');
+ onDeleteProduct(id: string): void {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: 'You won\'t be able to revert this!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, delete it!'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      this.productService.deleteProduct(id).subscribe({
+        next: () => {
+          this.toastr.success('Product deleted successfully', 'Success');
+
+          // 1️⃣ supprimer du tableau principal
+          this.products = this.products.filter(p => p.id !== id);
+
+          // 2️⃣ recalcul filtres + pagination
+          this.applyFiltersAndSort();
+
+          // 3️⃣ sécurité paginator (éviter page vide)
+          if (this.pageIndex > 0 && this.paginatedProducts.length === 0) {
+            this.pageIndex--;
+            this.applyFiltersAndSort();
           }
-        });
-      }
-    });
-  }
+        },
+        error: () => {
+          this.toastr.error('Failed to delete product', 'Error');
+        }
+      });
+    }
+  });
+}
 
-  // ===== NOUVELLES MÉTHODES À AJOUTER =====
+trackById(index: number, product: any): string {
+  return product.id;
+}
 
-  // Applique les filtres, recherche et tri
+
   applyFiltersAndSort(): void {
     let filtered = [...this.products];
 

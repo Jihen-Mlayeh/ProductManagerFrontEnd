@@ -1,4 +1,5 @@
-import { WebTracerProvider } from '@opentelemetry/sdk-trace-web';
+import { WebTracerProvider, BatchSpanProcessor } from '@opentelemetry/sdk-trace-web';
+import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 import { DocumentLoadInstrumentation } from '@opentelemetry/instrumentation-document-load';
@@ -8,6 +9,15 @@ import { FetchInstrumentation } from '@opentelemetry/instrumentation-fetch';
 
 export function initTelemetry() {
   const provider = new WebTracerProvider();
+
+  // ✅ Utiliser l'URL complète (le proxy Angular va intercepter)
+  const exporter = new OTLPTraceExporter({
+    url: 'http://localhost:4200/v1/traces',  // ← Via proxy Angular
+    headers: {}
+  });
+
+  const spanProcessor = new BatchSpanProcessor(exporter);
+  provider.addSpanProcessor(spanProcessor);
 
   provider.register({
     contextManager: new ZoneContextManager()
@@ -29,8 +39,9 @@ export function initTelemetry() {
     ]
   });
 
-  console.log('✅ OpenTelemetry initialized (basic instrumentation)');
-  console.log('📊 HTTP requests will be traced automatically');
+  console.log('✅ OpenTelemetry initialized with Jaeger exporter');
+  console.log('📊 Traces will be sent to: http://localhost:4200/v1/traces (via proxy → localhost:4318)');
+  console.log('🔍 View traces at: http://localhost:16686');
   
   return provider;
 }

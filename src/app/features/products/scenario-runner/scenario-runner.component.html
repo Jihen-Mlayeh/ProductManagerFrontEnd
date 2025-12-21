@@ -1,0 +1,76 @@
+<div class="scenario-runner-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>play_circle</mat-icon>
+        Scenario Test Runner
+      </mat-card-title>
+      <mat-card-subtitle>Execute diverse user scenarios for tracing</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- STEP 1: Setup Users -->
+      <div class="setup-section">
+        <h3>Step 1: Setup Test Users</h3>
+        <p>Create all test users needed for scenarios</p>
+        <button 
+          mat-raised-button 
+          color="accent" 
+          (click)="setupUsers()"
+          [disabled]="isRunning">
+          <mat-icon>person_add</mat-icon>
+          Create Test Users
+        </button>
+        <mat-chip *ngIf="usersCreated" color="primary">
+          <mat-icon>check</mat-icon>
+          Users Ready
+        </mat-chip>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- STEP 2: Run Scenarios -->
+      <div class="action-buttons">
+        <h3>Step 2: Run Scenarios</h3>
+        <button 
+          mat-raised-button 
+          color="primary" 
+          (click)="runAllScenarios()"
+          [disabled]="isRunning || !usersCreated">
+          <mat-icon>play_arrow</mat-icon>
+          Run All Scenarios
+        </button>
+      </div>
+
+      <mat-progress-bar 
+        *ngIf="isRunning" 
+        mode="indeterminate"
+        class="progress-bar">
+      </mat-progress-bar>
+
+      <div class="current-scenario" *ngIf="currentScenario">
+        <mat-chip color="accent">Running: {{ currentScenario }}</mat-chip>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <div class="scenarios-list">
+        <h3>Available Scenarios</h3>
+        <mat-list>
+          <mat-list-item *ngFor="let scenario of scenarios">
+            <mat-icon matListItemIcon>person</mat-icon>
+            <div matListItemTitle>{{ scenario.name }}</div>
+            <div matListItemLine>{{ scenario.user.email }} - {{ scenario.steps.length }} steps</div>
+            <button 
+              mat-icon-button 
+              (click)="runScenario(scenario)"
+              [disabled]="isRunning || !usersCreated"
+              matListItemMeta>
+              <mat-icon>play_arrow</mat-icon>
+            </button>
+          </mat-list-item>
+        </mat-list>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

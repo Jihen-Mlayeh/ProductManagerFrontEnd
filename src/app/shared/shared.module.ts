@@ -28,7 +28,8 @@ import { MatDividerModule } from '@angular/material/divider'; // ✅ AJOUTER
 // Components
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { FooterComponent } from './components/footer/footer.component';
-
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatListModule } from '@angular/material/list';
 const MATERIAL_MODULES = [
   MatToolbarModule,
   MatButtonModule,
@@ -49,7 +50,9 @@ const MATERIAL_MODULES = [
   MatDatepickerModule,
   MatNativeDateModule,
   MatSelectModule,
-  MatDividerModule // ✅ AJOUTER
+  MatDividerModule,
+  MatProgressBarModule,  // ✅ AJOUTER
+  MatListModule,        // ✅ AJOUTER // ✅ AJOUTER
 ];
 
 @NgModule({

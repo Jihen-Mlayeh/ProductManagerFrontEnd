@@ -15,18 +15,22 @@ export class ProductCardComponent {
   constructor(private router: Router) {}
 
   onViewDetails(): void {
-    this.router.navigate(['/products', this.product.id]);
-  }
+  const id = this.product.id || this.product._id;  // ✅ Support des deux
+  this.router.navigate(['/products', id]);
+}
 
-  onEdit(): void {
-    this.router.navigate(['/products', this.product.id, 'edit']);
-  }
+ onEdit(): void {
+  const id = this.product.id || this.product._id;  // ✅ Support des deux
+  this.router.navigate(['/products', id, 'edit']);
+}
 
-  onDelete(): void {
-    if (this.product.id) {
-      this.deleteProduct.emit(this.product.id);
-    }
+ onDelete(): void {
+  const id = this.product.id || this.product._id;  // ✅ Support des deux
+  if (id) {
+    console.log('🗑️ Card emitting delete for:', id);
+    this.deleteProduct.emit(id);
   }
+}
 
   isExpired(): boolean {
     if (!this.product.expirationDate) return false;

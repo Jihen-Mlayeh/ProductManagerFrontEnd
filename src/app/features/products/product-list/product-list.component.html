@@ -147,15 +147,14 @@
     </div>
   </div>
 
-  <!-- Products Grid/List -->
+  <!-- Products Container -->
   <div class="products-container" *ngIf="!loading && paginatedProducts.length > 0">
     <div class="products-grid" [class.list-view]="viewMode === 'list'">
-     <app-product-card 
-  *ngFor="let product of paginatedProducts; trackBy: trackById"
-  [product]="product"
-  (deleteProduct)="onDeleteProduct($event)">
-</app-product-card>
-
+      <app-product-card 
+        *ngFor="let product of paginatedProducts; trackBy: trackById"
+        [product]="product"
+        (deleteProduct)="onDeleteProduct($event)">
+      </app-product-card>
     </div>
 
     <!-- Pagination -->

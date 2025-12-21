@@ -15,17 +15,23 @@ export class ProductService {
   constructor(private http: HttpClient) {}
 
   /**
+   * Mapper centralisé: _id → id
+   */
+  private mapProduct(p: any): Product {
+    return {
+      ...p,
+      id: p._id || p.id,  // ✅ Support _id ET id
+      _id: p._id          // ✅ Garde aussi _id
+    };
+  }
+
+  /**
    * Obtenir tous les produits
    */
   getAllProducts(): Observable<Product[]> {
     return this.http.get<any[]>(this.API_URL).pipe(
-      map(products =>
-        products.map(p => ({
-          ...p,
-          id: p.id ?? p._id   // ✅ NORMALISATION ICI
-        }))
-      ),
-      tap(products => console.log('Products fetched:', products.length)),
+      map(products => products.map(p => this.mapProduct(p))),
+      tap(products => console.log('✅ Products fetched:', products.length)),
       catchError(this.handleError)
     );
   }
@@ -35,11 +41,8 @@ export class ProductService {
    */
   getProductById(id: string): Observable<Product> {
     return this.http.get<any>(`${this.API_URL}/${id}`).pipe(
-      map(p => ({
-        ...p,
-        id: p.id ?? p._id   // ✅ COHÉRENCE
-      })),
-      tap(product => console.log('Product fetched:', product)),
+      map(p => this.mapProduct(p)),
+      tap(product => console.log('✅ Product fetched:', product)),
       catchError(this.handleError)
     );
   }
@@ -48,12 +51,10 @@ export class ProductService {
    * Créer un nouveau produit
    */
   createProduct(product: ProductCreateRequest): Observable<Product> {
+    console.log('📤 Creating product:', product);
     return this.http.post<any>(this.API_URL, product).pipe(
-      map(p => ({
-        ...p,
-        id: p.id ?? p._id   // ✅ IMPORTANT POUR LE FRONT
-      })),
-      tap(newProduct => console.log('Product created:', newProduct)),
+      map(p => this.mapProduct(p)),
+      tap(created => console.log('✅ Product created:', created)),
       catchError(this.handleError)
     );
   }
@@ -62,45 +63,41 @@ export class ProductService {
    * Mettre à jour un produit
    */
   updateProduct(id: string, product: ProductUpdateRequest): Observable<Product> {
+    console.log('📤 Updating product:', id, product);
     return this.http.put<any>(`${this.API_URL}/${id}`, product).pipe(
-      map(p => ({
-        ...p,
-        id: p.id ?? p._id
-      })),
-      tap(updatedProduct => console.log('Product updated:', updatedProduct)),
+      map(p => this.mapProduct(p)),
+      tap(updated => console.log('✅ Product updated:', updated)),
       catchError(this.handleError)
     );
   }
 
   /**
-   * Supprimer un produit
-   */
-  deleteProduct(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.API_URL}/${id}`).pipe(
-      tap(() => console.log('Product deleted:', id)),
-      catchError(this.handleError)
-    );
-  }
-
-  /**
-   * Rechercher des produits par nom
-   */
-  searchProducts(query: string): Observable<Product[]> {
-    return this.getAllProducts().pipe(
-      map(products =>
-        products.filter(p =>
-          p.name.toLowerCase().includes(query.toLowerCase())
-        )
-      ),
-      tap(filtered => console.log('Search results:', filtered.length))
-    );
-  }
+ * Supprimer un produit
+ */
+deleteProduct(id: string): Observable<void> {
+  return this.http.delete(`${this.API_URL}/${id}`, { 
+    responseType: 'text' as 'json'  // ✅ Accepte du texte au lieu de JSON
+  }).pipe(
+    map(() => undefined),  // ✅ Convertit en void
+    tap(() => console.log('✅ Product deleted:', id)),
+    catchError(this.handleError)
+  );
+}
 
   /**
    * Gestion des erreurs
    */
   private handleError(error: any): Observable<never> {
-    console.error('An error occurred:', error);
-    return throwError(() => new Error(error.message || 'Server error'));
+    console.error('❌ An error occurred:', error);
+    
+    let errorMessage = 'Server error';
+    if (error.error?.message) {
+      errorMessage = error.error.message;
+    } else if (error.message) {
+      errorMessage = error.message;
+    }
+    
+    return throwError(() => new Error(errorMessage));
   }
+  
 }
